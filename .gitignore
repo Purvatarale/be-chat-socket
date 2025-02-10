@@ -1,0 +1,4 @@
+node_modules/
+# Dockerfile.backend
+.env
+listener.sh

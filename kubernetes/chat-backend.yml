@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-backend
+  labels:
+    app: chat-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-backend
+  template:
+    metadata:
+      labels:
+        app: chat-backend
+    spec:
+      containers:
+        - name: chat-backend
+          image: gitlab.iitb.ac.in:5050/asc/services/chat-backend:test
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 4000
+          env:
+            - name: MONGO_URI
+              value: "mongodb://mongodb:27017/iitbchat"
+            - name: PORT
+              value: "4000"
+      imagePullSecrets:
+        - name: gitlab-registry

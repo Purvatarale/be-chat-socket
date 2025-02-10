@@ -1,0 +1,129 @@
+variables:
+  IMAGE_NAME: chatwootbackend
+  VERSION: "1.0"
+  CI_REGISTRY_IMAGE: gitlab.iitb.ac.in:5050/asc/services/chat-backend 
+  PIPELINE_ID: $CI_PIPELINE_ID
+  IMAGE_TAG: "test"
+ 
+
+stages:
+#  - lint-test
+#  - lint-report to sonar
+#  - sonarqube-check
+#  - sonarqube-vulnerability-report
+  - build
+  - push
+  - deploy
+#  - environment_check
+
+# lint:
+#   stage: lint-test
+#   image: node:18  
+#   script:
+#     - npm install 
+#     # - npm install globals --save-dev
+#     # - npm install eslint --save-dev   
+#     - npx eslint . -f json > eslint-results.json || true
+#   artifacts:
+#     paths:
+#       - eslint-results.json
+#     expire_in: 1 week       
+#   allow_failure: true
+# 
+# lint-report to sonarqube:
+# #  stage: lint-report to sonar
+#   image: 
+#     name: sonarsource/sonar-scanner-cli:5.0
+#   script:
+#     - sonar-scanner -Dsonar.projectKey=chat-backend -Dsonar.projectVersion=1.0 -Dsonar.sources=. -Dsonar.eslint.reportPaths=eslint-results.json
+# 
+#   allow_failure: true
+# 
+# 
+# sonarqube-check:
+# #  stage: sonarqube-check
+#   image: 
+#     name: sonarsource/sonar-scanner-cli:5.0
+#     entrypoint: [""]
+#   variables:
+#     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" 
+#     GIT_DEPTH: "0" 
+#   cache:
+#     key: "${CI_JOB_NAME}"
+#     paths:
+#       - .sonar/cache
+#   script: 
+#     - sonar-scanner
+#   allow_failure: true
+#   #only:
+#     #- merge_requests
+#     #- master
+#     #- main
+#     #- develop
+# 
+# sonarqube-vulnerability-report:
+# #  stage: sonarqube-vulnerability-report
+#   image: 
+#     name: sonarsource/sonar-scanner-cli:5.0
+#     entrypoint: [""]
+#   script:
+#     - 'curl -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/issues/gitlab_sast_export?projectKey=chat-backend&branch=${CI_COMMIT_BRANCH}&pullRequest=${CI_MERGE_REQUEST_IID}" -o gl-sast-sonar-report.json'
+#   allow_failure: true
+#   # only:
+#   #   - merge_requests
+#   #   - master
+#   #   - main
+#   #   - develop
+#   artifacts:
+#     expire_in: 1 day
+#     reports:
+#       sast: gl-sast-sonar-report.json
+#   dependencies:
+#     - sonarqube-check
+
+
+build_image:
+  stage: build
+  tags:
+    - shell  
+      
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$IMAGE_TAG .  
+
+push_image:
+  stage: push 
+  needs:
+    - build_image
+  tags:
+    - shell 
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY  
+  script:
+    - docker push $CI_REGISTRY_IMAGE:$IMAGE_TAG 
+
+deploy_to_k8s:
+  stage: deploy
+  needs:
+    - push_image
+  tags:
+    - shell
+  before_script:
+    - export PATH=$PATH:/usr/local/bin:/usr/local/sbin
+    - kubectl version
+  script:
+    - kubectl apply -f kubernetes/chat-backend.yml
+    - kubectl rollout restart deployment/chat-backend
+    #- envsubst < kubernetes/chat-backend.yml | kubectl apply -f - 
+
+
+# environment_check:
+#   stage: environment_check
+#   script:
+#     - echo "Checking the application health status"
+#     
+#     # - curl -f http://portal.iitb.ac.in/chatapp/health || exit 1
+#   environment:
+#     name: Development
+#     url: https://portal.iitb.ac.in/chatapp/api/v1/categories
+#   only:
+#     - 4-chatwoot-api-integration

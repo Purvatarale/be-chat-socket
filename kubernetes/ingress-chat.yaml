@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chat-ingress
+  annotations:
+    networking.k8s.io/ingress.class: "nginx"
+spec:
+  ingressClassName: "nginx"
+  rules:
+  - host: "portal.iitb.ac.in"
+    http:
+      paths:
+      - pathType: Prefix
+        path: /chatapp
+        backend:
+          service:
+            name: chat-backend
+            port:
+              number: 4000

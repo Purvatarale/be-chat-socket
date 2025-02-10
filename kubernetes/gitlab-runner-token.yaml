@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gitlab-runner-token
+  annotations:
+    kubernetes.io/service-account.name: gitlab-runner
+type: kubernetes.io/service-account-token
