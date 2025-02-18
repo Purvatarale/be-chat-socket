@@ -108,7 +108,7 @@ exports.getConversationByUserId = async (req, res) => {
 
     const conversations = await Conversation.find({
       user: user._id,
-    }).sort({ created_at: -1 });
+    }).sort({ updatedAt: -1 });
 
     res.status(200).json(conversations);
   } catch (error) {
@@ -134,7 +134,7 @@ exports.getConversationById = async (req, res) => {
     if (!conversation)
       return res.status(404).json({ error: "Conversation not found" });
     const messages = formatMessages(conversation.messages);
-    res.status(200).json({ ...conversation.toJSON(), messages });
+    res.status(200).json({ ...conversation.toJSON(), count: conversation.messages.length, messages });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to retrieve conversation" });

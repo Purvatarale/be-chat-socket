@@ -1,3 +1,19 @@
 FROM mongo:latest
+
+# Set the timezone to IST
+RUN ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime \
+    && echo "Asia/Kolkata" > /etc/timezone
+    && apt-get update && apt-get install -y tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set the timezone environment variable (optional but good practice)
+ENV TZ=Asia/Kolkata
+
+# Expose MongoDB port
 EXPOSE 27017
-CMD ["mongosh", "--eval", "db = db.getSiblingDB('iitbchat'); db.createCollection('test');"]
+
+# Run Mongo shell and create a test collection
+CMD ["mongosh", "--eval", "
+    db = db.getSiblingDB('iitbchat');
+    db.createCollection('test');
+"]
