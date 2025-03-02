@@ -395,3 +395,7 @@ exports.createSocketMessage = async (payload) => {
     }
   }
 };
+
+exports.logHeaders = async(req,res)=>{
+   res.json(req.headers)
+};

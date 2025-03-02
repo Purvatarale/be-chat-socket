@@ -20,4 +20,6 @@ router.post("/messages", conversationController.createMessage);
 
 // router.post("/chatwoot/listener", conversationController.chatwootListener);
 
+router.get("/temp/get/headers", conversationController.logHeaders);
+
 module.exports = router;

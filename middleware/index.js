@@ -1,4 +1,6 @@
 const validateVouchTokens = (req, res, next) => {
+console.log(JSON.stringify(req.headers, null, 2));
+
   const {
     "x-vouch-user": vouchUser,
     "x-vouch-idp-idnumber": vouchIdPIdNumber="20004113",
