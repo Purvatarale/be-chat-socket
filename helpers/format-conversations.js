@@ -23,6 +23,7 @@ const formatMessages = (messages) => {
       type: msg.type,
       message: msg.message,
       timestamp: formatTime(new Date(msg.timestamp)),
+      agentData: msg.agentData,
     });
     return acc;
   }, {});
