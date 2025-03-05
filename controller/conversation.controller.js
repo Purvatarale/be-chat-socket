@@ -272,7 +272,7 @@ const handleOutgoingMessage = async (payload) => {
     message: messageContent,
     messageID: chatwootMessageId,
     timestamp: messageCreatedAt,
-    senderData: {
+    agentData: {
       name: senderName,
       email: senderEmail,
       id,
@@ -287,7 +287,7 @@ const handleOutgoingMessage = async (payload) => {
     type: "outgoing",
     message: messageContent,
     timestamp: messageCreatedAt,
-    senderData: {
+    agentData: {
       name: senderName,
       email: senderEmail,
       id,
